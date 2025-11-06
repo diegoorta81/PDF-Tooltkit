@@ -229,11 +229,20 @@ class DFToolkitModern:
 
         self.root.config(menu=menubar)
 
+    def abrir_carpeta_resultados(self):
+            # Cambia esta ruta a la carpeta que quieres abrir
+            carpeta_resultados = config.get("result_folder", DEFAULT_CONFIG["result_folder"])
+
+            if os.path.exists(carpeta_resultados):
+                os.startfile(carpeta_resultados)  # Abre la carpeta en el explorador de Windows
+            else:
+                print("La carpeta de resultados no existe:", carpeta_resultados)
+
     def _open_config_window(self):
         win = Toplevel(self.root)
         win.title("Configuración de carpetas")
         win.geometry("560x220")
-        win.resizable(False, False)
+        win.resizable(True, True)
         win.transient(self.root)
         win.grab_set()
 
@@ -258,6 +267,8 @@ class DFToolkitModern:
         theme_combo = ttk.Combobox(frm, values=themes, textvariable=theme_var, width=24, state="readonly")
         theme_combo.grid(row=4, column=1, padx=6, sticky="w")
         theme_combo.bind("<<ComboboxSelected>>", lambda e: self.style.theme_use(theme_var.get()))
+
+        
 
         def save_and_close():
             cfg_log = logs_var.get().strip() or DEFAULT_CONFIG["log_folder"]
@@ -324,9 +335,11 @@ class DFToolkitModern:
         ttk.Button(sidebar, text=" Unir PDFs", image=ico_merge, compound=LEFT, bootstyle="info-outline", command=lambda: self._show_frame("merge")).pack(fill="x", padx=8, pady=6)
         ttk.Button(sidebar, text=" Extraer páginas", image=ico_extract, compound=LEFT, bootstyle="info-outline", command=lambda: self._show_frame("extract")).pack(fill="x", padx=8, pady=6)
         ttk.Button(sidebar, text=" PDF → ODT", image=ico_pdf2odt, compound=LEFT, bootstyle="info-outline", command=lambda: self._show_frame("pdf2odt")).pack(fill="x", padx=8, pady=6)
+        
 
         ttk.Separator(sidebar).pack(fill="x", pady=8, padx=8)
         ttk.Button(sidebar, text=" Configuración", image=ico_settings, compound=LEFT, bootstyle="secondary-outline", command=self._open_config_window).pack(fill="x", padx=8, pady=6)
+        ttk.Button(sidebar, text=" Resultados", image=ico_settings, compound=LEFT, bootstyle="secondary-outline", command=self.abrir_carpeta_resultados).pack(fill="x", padx=8, pady=6)
 
         # Main content frames
         main = ttk.Frame(container)
@@ -367,7 +380,7 @@ class DFToolkitModern:
     # Frame: Buscar
     # ---------------------------
     def _build_search_frame(self, frame):
-        frm_top = ttk.LabelFrame(frame, text="Buscar texto en PDF", padding=10)
+        frm_top = ttk.Labelframe(frame, text="Buscar texto en PDF", padding=10)
         frm_top.pack(fill="x", padx=8, pady=8)
 
         ttk.Label(frm_top, text="Archivo PDF:").grid(row=0, column=0, sticky="w", padx=4, pady=4)
@@ -398,7 +411,7 @@ class DFToolkitModern:
         self.btn_search_stop = ttk.Button(frm_actions, text="Detener", bootstyle="danger-outline", command=self._stop_worker, state="disabled")
         self.btn_search_stop.pack(side=LEFT, padx=6)
 
-        frm_log = ttk.LabelFrame(frame, text="Resultados / Log", padding=8)
+        frm_log = ttk.Labelframe(frame, text="Resultados / Log", padding=8)
         frm_log.pack(fill="both", expand=True, padx=8, pady=8)
         self.progress_search_var = IntVar(value=0)
         ttk.Progressbar(frm_log, variable=self.progress_search_var, maximum=100).pack(fill="x", pady=2)
@@ -416,7 +429,7 @@ class DFToolkitModern:
     # Frame: Numerar
     # ---------------------------
     def _build_number_frame(self, frame):
-        frm = ttk.LabelFrame(frame, text="Numeración de páginas", padding=10)
+        frm = ttk.Labelframe(frame, text="Numeración de páginas", padding=10)
         frm.pack(fill="x", padx=8, pady=8)
 
         ttk.Label(frm, text="Archivo PDF:").grid(row=0, column=0, sticky="w", padx=4, pady=4)
@@ -457,7 +470,7 @@ class DFToolkitModern:
         self.btn_number_stop = ttk.Button(frm_btns, text="Detener", bootstyle="danger-outline", command=self._stop_worker, state="disabled")
         self.btn_number_stop.pack(side=LEFT, padx=6)
 
-        frm_log = ttk.LabelFrame(frame, text="Log", padding=8)
+        frm_log = ttk.Labelframe(frame, text="Log", padding=8)
         frm_log.pack(fill="both", expand=True, padx=8, pady=8)
         self.progress_number_var = IntVar(value=0)
         ttk.Progressbar(frm_log, variable=self.progress_number_var, maximum=100).pack(fill="x", pady=2)
@@ -475,7 +488,7 @@ class DFToolkitModern:
     # Frame: Merge
     # ---------------------------
     def _build_merge_frame(self, frame):
-        frm = ttk.LabelFrame(frame, text="Unir PDFs", padding=10)
+        frm = ttk.Labelframe(frame, text="Unir PDFs", padding=10)
         frm.pack(fill="both", expand=True, padx=8, pady=8)
 
         left = ttk.Frame(frm)
@@ -516,7 +529,7 @@ class DFToolkitModern:
         self.btn_merge_stop = ttk.Button(frm_btns, text="Detener", bootstyle="danger-outline", command=self._stop_worker, state="disabled")
         self.btn_merge_stop.pack(side=LEFT, padx=6)
 
-        frame_log = ttk.LabelFrame(frm, text="Log", padding=8)
+        frame_log = ttk.Labelframe(frm, text="Log", padding=8)
         frame_log.pack(fill="both", expand=True, padx=8, pady=8)
         self.progress_merge_var = IntVar(value=0)
         ttk.Progressbar(frame_log, variable=self.progress_merge_var, maximum=100).pack(fill="x", pady=2)
@@ -557,7 +570,7 @@ class DFToolkitModern:
     # Frame: Extract
     # ---------------------------
     def _build_extract_frame(self, frame):
-        frm_top = ttk.LabelFrame(frame, text="Extraer páginas", padding=10)
+        frm_top = ttk.Labelframe(frame, text="Extraer páginas", padding=10)
         frm_top.pack(fill="x", padx=8, pady=8)
 
         ttk.Label(frm_top, text="Archivo PDF:").grid(row=0, column=0, sticky="w", padx=4, pady=4)
@@ -580,7 +593,7 @@ class DFToolkitModern:
         self.btn_extract_stop = ttk.Button(frm_actions, text="Detener", bootstyle="danger-outline", command=self._stop_worker, state="disabled")
         self.btn_extract_stop.pack(side=LEFT, padx=6)
 
-        frm_log = ttk.LabelFrame(frame, text="Log", padding=8)
+        frm_log = ttk.Labelframe(frame, text="Log", padding=8)
         frm_log.pack(fill="both", expand=True, padx=8, pady=8)
         self.progress_extract_var = IntVar(value=0)
         ttk.Progressbar(frm_log, variable=self.progress_extract_var, maximum=100).pack(fill="x", pady=2)
@@ -598,7 +611,7 @@ class DFToolkitModern:
     # Frame: PDF -> ODT (pdfminer)
     # ---------------------------
     def _build_pdf2odt_frame(self, frame):
-        frm_top = ttk.LabelFrame(frame, text="Convertir PDF a ODT (pdfminer.six + odfpy)", padding=10)
+        frm_top = ttk.Labelframe(frame, text="Convertir PDF a ODT (pdfminer.six + odfpy)", padding=10)
         frm_top.pack(fill="x", padx=8, pady=8)
 
         ttk.Label(frm_top, text="Archivo PDF:").grid(row=0, column=0, sticky="w", padx=4, pady=4)
@@ -616,7 +629,7 @@ class DFToolkitModern:
         self.btn_pdf2odt_stop = ttk.Button(frm_actions, text="Detener", bootstyle="danger-outline", command=self._stop_worker, state="disabled")
         self.btn_pdf2odt_stop.pack(side=LEFT, padx=6)
 
-        frm_log = ttk.LabelFrame(frame, text="Log", padding=8)
+        frm_log = ttk.Labelframe(frame, text="Log", padding=8)
         frm_log.pack(fill="both", expand=True, padx=8, pady=8)
         self.progress_pdf2odt_var = IntVar(value=0)
         ttk.Progressbar(frm_log, variable=self.progress_pdf2odt_var, maximum=100).pack(fill="x", pady=2)
